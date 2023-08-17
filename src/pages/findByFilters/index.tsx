@@ -1,7 +1,7 @@
 import { Badge, Button, Col, Form, Row, Stack } from 'react-bootstrap';
 import CustomNavbar from '../../components/CustomNavbar';
 import Title from '../../components/Title';
-import { Container } from './style';
+import { Container, OccupationText, Report, Subtitle } from './style';
 import { useState } from 'react';
 import api from '../../services/api';
 import { toast } from 'react-toastify';
@@ -9,6 +9,7 @@ import CustomModal from '../../components/CustomModal';
 import { CardUser, ContainerImageName, ContainerSkills, ContainerUsers, Name, Occupation, Image } from '../../components/ListUsers/style';
 import { useNavigate } from "react-router-dom";
 import { User } from '../../models/userModel';
+import { Divider } from '../CreateUser/style';
 
 function FindByFilters() {
     const [name, setName] = useState('');
@@ -25,6 +26,7 @@ function FindByFilters() {
     const [stateList, setStateList] = useState<string[]>([]);
     const [cityList, setCityList] = useState<string[]>([]);
     const [users, setUsers] = useState<User[]>([] as User[]);
+    const [showReport, setShowReport] = useState(false);
 
     const navigate = useNavigate();
 
@@ -112,7 +114,7 @@ function FindByFilters() {
         let query: any = {};
         if(nameList.length) query['nome'] = nameList.join(',');
         if(occupationList.length) query['profissao'] = occupationList.join(',');
-        if(skillList.length) query['profissao'] = skillList.join(',');
+        if(skillList.length) query['habilidades'] = skillList.join(',');
         if(levelList.length) query['nivelSenioridade'] = levelList.join(',');
         if(cityList.length) query['cidade'] = cityList.join(',');
         if(stateList.length) query['estado'] = stateList.join(',');
@@ -182,9 +184,42 @@ function FindByFilters() {
                             })
                         }
                     </ContainerUsers>
-                    <Button className='mt-4 mx-2' variant="success" onClick={() => setUsers([])}>
-                        Buscar novamente
-                    </Button>
+                    {
+                        showReport && (
+                            <>
+                                <Divider />
+                                <Subtitle>Relatório</Subtitle>
+                                <Report>
+                                    {
+                                        users.map(user => {
+                                            return (
+                                                <>
+                                                    <h2>{user.nome}, {user.idade}</h2>
+                                                    <OccupationText>{user.profissao}</OccupationText>
+                                                    <span>Habilidades: {user.habilidades}</span>
+                                                    <span>Currículo: {user.urlCurriculo}</span>
+                                                    <Divider />
+                                                    <br />
+                                                </>
+                                            )
+                                        })
+                                    }
+                                </Report>
+                            </>
+                        )
+                    }
+                    <Row className='w-100 d-flex'>
+
+                        <Col lg={12}>
+                            <Button className='mt-4 mx-2' variant="success" onClick={() => setUsers([])}>
+                                Buscar novamente
+                            </Button>
+
+                            <Button className='mt-4 mx-2' variant="primary" onClick={() => setShowReport(!showReport)}>
+                                {showReport ? 'Esconder relatório' : 'Gerar relatório'}
+                            </Button>
+                        </Col>
+                    </Row>
                 </>
             ) : (
                 <>
